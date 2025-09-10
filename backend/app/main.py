@@ -5,10 +5,9 @@ from pathlib import Path
 from backend.pipeline import run_pipeline
 from fastapi.middleware.cors import CORSMiddleware
 
-# Create FastAPI app
+
 app = FastAPI()
 
-# ✅ Enable CORS so frontend (localhost:3000) can talk to backend (localhost:8000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # frontend URLs

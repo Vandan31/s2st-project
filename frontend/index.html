@@ -7,6 +7,23 @@
 <body>
   <h2>Offline Speech-to-Speech Translation Demo</h2>
 
+  <!-- Model Selection -->
+  <div>
+    <label>ASR Model:</label>
+    <select id="asrChoice">
+      <option value="whisper">Whisper</option>
+      <option value="vosk">Vosk</option>
+      <!-- add wav2vec2, coqui later -->
+    </select>
+
+    <label>TTS Model:</label>
+    <select id="ttsChoice">
+      <option value="espeak">Espeak</option>
+      <option value="coqui">Coqui TTS</option>
+      <!-- add IndicTTS, VITS later -->
+    </select>
+  </div>
+
   <!-- Upload -->
   <div>
     <input id="upload" type="file" accept="audio/*"/>
@@ -74,15 +91,19 @@ sendFileBtn.addEventListener('click', async () => {
 
   const fd = new FormData();
   fd.append('file', file, file.name);
+  fd.append('asr_choice', document.getElementById('asrChoice').value);
+  fd.append('tts_choice', document.getElementById('ttsChoice').value);
 
   const res = await fetch('http://localhost:8000/infer', {
     method: 'POST',
     body: fd
   });
-   if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Server returned ${res.status}: ${text}`);
-    }
+  
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Server returned ${res.status}: ${text}`);
+  }
+
   const j = await res.json();
   document.getElementById('enText').innerText = j.en_text;
   document.getElementById('hiText').innerText = j.hi_text;

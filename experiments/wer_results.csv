@@ -1,0 +1,4 @@
+ASR Model,Test Dataset,Audio,Ref,Hyp,WER (%),CER (%)
+Whisper,Common Voice Subset,data/tests/espeak_test.wav,"Hello my name is vandan , I am from Mtech AI","sl Hu-he? Not too far you know. You're incredibly recommended. All right. Now, let's go take a look. I've never seen typical American boys on the shameless build of their superstitious disciple Marina de Project, whose power canExcsche",345.45,461.36
+Whisper,Common Voice Subset,data/tests/input.wav,"Hello my name is vandan , I am from Mtech AI","Hello, my name is Vandan. I am in MTech AI.",54.55,22.73
+Whisper,Common Voice Subset,data/tests/sample.wav,"Hello my name is vandan , I am from Mtech AI","Hello, my name is Vandan. I am in MTech AI.",54.55,22.73
