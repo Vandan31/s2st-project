@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+
+# Environment files
+.env
+
+# Data and outputs
+backend/uploads/
+backend/outputs/
+data/output/
+
+# OS junk
+.DS_Store
+Thumbs.db

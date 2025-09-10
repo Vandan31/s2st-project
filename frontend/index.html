@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>S2ST Demo</title>
+</head>
+<body>
+  <h2>Offline Speech-to-Speech Translation Demo</h2>
+
+  <!-- Upload -->
+  <div>
+    <input id="upload" type="file" accept="audio/*"/>
+    <button id="sendFileBtn">Send File</button>
+  </div>
+
+  <!-- Record -->
+  <div>
+    <button id="recordBtn">Record</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <audio id="player" controls></audio>
+  </div>
+
+  <!-- Results -->
+  <div>
+    <h3>Results:</h3>
+    <p><strong>ASR (English):</strong> <span id="enText"></span></p>
+    <p><strong>Translation (Hindi):</strong> <span id="hiText"></span></p>
+    <audio id="hiAudio" controls></audio>
+  </div>
+
+<script>
+let mediaRecorder, audioChunks;
+
+const recordBtn = document.getElementById('recordBtn');
+const stopBtn = document.getElementById('stopBtn');
+const player = document.getElementById('player');
+const upload = document.getElementById('upload');
+const sendFileBtn = document.getElementById('sendFileBtn');
+
+// Record audio
+recordBtn.addEventListener('click', async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  mediaRecorder = new MediaRecorder(stream);
+  audioChunks = [];
+  mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    player.src = URL.createObjectURL(blob);
+    player.play();
+  };
+  mediaRecorder.start();
+  recordBtn.disabled = true;
+  stopBtn.disabled = false;
+});
+
+stopBtn.addEventListener('click', () => {
+  mediaRecorder.stop();
+  recordBtn.disabled = false;
+  stopBtn.disabled = true;
+});
+
+// Send file to backend
+sendFileBtn.addEventListener('click', async () => {
+  let file;
+  if (player.src && !upload.files.length) {
+    const blob = await fetch(player.src).then(r => r.blob());
+    file = new File([blob], "recording.webm", { type: blob.type });
+  } else if (upload.files.length) {
+    file = upload.files[0];
+  } else {
+    alert("Record or select a file first");
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('file', file, file.name);
+
+  const res = await fetch('http://localhost:8000/infer', {
+    method: 'POST',
+    body: fd
+  });
+   if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Server returned ${res.status}: ${text}`);
+    }
+  const j = await res.json();
+  document.getElementById('enText').innerText = j.en_text;
+  document.getElementById('hiText').innerText = j.hi_text;
+  document.getElementById('hiAudio').src = 'http://localhost:8000' + j.tts_url;
+});
+</script>
+</body>
+</html>
